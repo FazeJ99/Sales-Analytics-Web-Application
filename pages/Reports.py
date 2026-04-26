@@ -18,10 +18,20 @@ from reportlab.lib.enums import TA_CENTER
 
 st.set_page_config(page_title="Reports", page_icon="📄", layout="wide")
 
-# --- CSS ---
+# --- SIDEBAR COLLAPSE FIX ---
+st.markdown("""
+    <style>
+    [data-testid="collapsedControl"] { display: none !important; }
+    </style>
+""", unsafe_allow_html=True)
+
+# --- CSS & SIDEBAR FIX ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    /* --- SIDEBAR COLLAPSE FIX --- */
+    [data-testid="collapsedControl"] { display: none !important; }
     
     .stApp { background: linear-gradient(180deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%); }
     #MainMenu, footer, header, [data-testid="stToolbar"], [data-testid="stSidebarNav"] { display: none !important; }
@@ -77,8 +87,17 @@ def main():
                 if include_basket and st.session_state.get('basket_rules') is None:
                     try:
                         from pages.Basket_Analysis import run_analysis
-                        rules = run_analysis(df, min_support=0.02, min_lift=1.2)
-                        st.session_state['basket_rules'] = rules
+                        
+                        # Safely detect the order column before running Apriori
+                        possible_id_cols = ['transaction_id', 'order_id', 'invoice_no', 'InvoiceNo', 'OrderID']
+                        order_col = next((col for col in possible_id_cols if col in df.columns), None)
+                        
+                        if order_col:
+                            rules = run_analysis(df, order_col, min_support=0.02, min_lift=1.2)
+                            st.session_state['basket_rules'] = rules
+                        else:
+                            st.session_state['basket_rules'] = pd.DataFrame() # Graceful fallback
+                            
                     except Exception as e:
                         st.error(f"Basket Analysis Auto-Run Error: {e}")
                         include_basket = False
@@ -86,7 +105,9 @@ def main():
                 # --- AUTO-RUN AI FORECAST ---
                 if include_forecast and st.session_state.get('model_results') is None:
                     try:
+                        # Fixed the capital 'F' for Linux deployment
                         from pages.AI_forecasting import train_models
+                        
                         daily = df.groupby('order_date')['total_value'].sum().reset_index()
                         daily = daily.set_index('order_date').resample('D').sum().reset_index().sort_values('order_date')
                         

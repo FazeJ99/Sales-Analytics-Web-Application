@@ -15,6 +15,13 @@ except ImportError:
 
 st.set_page_config(page_title="AI Assistant", page_icon="💬", layout="wide")
 
+# --- SIDEBAR COLLAPSE FIX ---
+st.markdown("""
+    <style>
+    [data-testid="collapsedControl"] { display: none !important; }
+    </style>
+""", unsafe_allow_html=True)
+
 # --- CSS ---
 st.markdown("""
 <style>
@@ -35,6 +42,22 @@ st.markdown("""
         padding: 1rem;
         margin-bottom: 1rem;
         border: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    /* Make chat text bright, crisp, and readable */
+    [data-testid="stChatMessage"] p, 
+    [data-testid="stChatMessage"] li, 
+    [data-testid="stChatMessage"] span {
+        color: #f8fafc !important; 
+        line-height: 1.6 !important;
+        font-size: 1.05rem !important;
+    }
+    
+    /* Make the AI's bold recommendations really pop */
+    [data-testid="stChatMessage"] strong,
+    [data-testid="stChatMessage"] b {
+        color: #ffffff !important;
+        font-weight: 600 !important;
     }
     
     [data-testid="stChatInput"] {
@@ -63,7 +86,7 @@ def main():
         
     df = st.session_state['data']
     
-# Pull the API key silently from the hidden secrets file
+    # Pull the API key silently from the hidden secrets file
     api_key = st.secrets["GEMINI_API_KEY"]
     st.markdown("---")
 

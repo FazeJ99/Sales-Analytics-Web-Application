@@ -6,56 +6,33 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from sidebar import create_sidebar  # <--- Importing your custom sidebar
+from sidebar import create_sidebar
 
 st.set_page_config(page_title="Dashboard", page_icon="📊", layout="wide")
 
-# --- STUNNING CSS ---
+# --- SIDEBAR COLLAPSE FIX ---
+st.markdown("""
+    <style>
+    [data-testid="collapsedControl"] { display: none !important; }
+    </style>
+""", unsafe_allow_html=True)
+
+# --- SIDEBAR COLLAPSE FIX & STRUCTURAL CSS ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     
-    :root {
-        --bg-primary: #0f0f1a;
-        --bg-secondary: #1a1a2e;
-        --bg-card: rgba(255, 255, 255, 0.05);
-        --text-primary: #ffffff;
-        --text-secondary: #a0a0a0;
-        --accent-primary: #6366f1;
-        --gradient-1: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-        --border-radius: 16px;
-    }
+    /* Hide sidebar collapse button */
+    [data-testid="collapsedControl"] { display: none !important; }
     
-    .stApp {
-        background: linear-gradient(180deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
-    }
-    
-    /* Hide Streamlit default menus */
-    #MainMenu, footer, header, [data-testid="stToolbar"], [data-testid="stSidebarNav"] { display: none !important; }
-    
-    .block-container {
-        padding: 2rem 3rem !important;
-    }
-    
-    h1, h2, h3 { color: var(--text-primary) !important; }
-    
-    h1 {
-        background: var(--gradient-1);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-    
-    p, span, label { color: var(--text-secondary) !important; }
+    .block-container { padding: 2rem 3rem !important; }
     
     [data-testid="stMetric"] {
         background: var(--bg-card);
-        border: 1px solid rgba(255,255,255,0.1);
+        border: 1px solid var(--border-color);
         border-radius: var(--border-radius);
         padding: 1rem 1.5rem;
     }
-    
-    [data-testid="stMetricLabel"] { color: var(--text-secondary) !important; }
-    [data-testid="stMetricValue"] { color: var(--text-primary) !important; font-weight: 600 !important; }
     
     .stTabs [data-baseweb="tab-list"] {
         background: var(--bg-card);
@@ -63,35 +40,31 @@ st.markdown("""
         padding: 0.5rem;
     }
     
-    .stTabs [data-baseweb="tab"] {
-        color: var(--text-secondary);
-        border-radius: 8px;
-    }
-    
-    .stTabs [aria-selected="true"] {
-        background: var(--gradient-1) !important;
-        color: white !important;
-    }
-    
     .glass-card {
         background: var(--bg-card);
         backdrop-filter: blur(10px);
-        border: 1px solid rgba(255,255,255,0.1);
+        border: 1px solid var(--border-color);
         border-radius: var(--border-radius);
         padding: 1.5rem;
         margin: 1rem 0;
     }
     
-    hr { border-color: rgba(255,255,255,0.1) !important; }
-    
     .streamlit-expanderHeader {
         background: var(--bg-card) !important;
         border-radius: 8px !important;
     }
+    
+    /* Date filter styling */
+    .date-filter-container {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-# Chart theme
 CHART_THEME = {
     'paper_bgcolor': 'rgba(0,0,0,0)',
     'plot_bgcolor': 'rgba(0,0,0,0)',
@@ -99,7 +72,6 @@ CHART_THEME = {
     'xaxis': {'gridcolor': 'rgba(255,255,255,0.1)', 'linecolor': 'rgba(255,255,255,0.1)'},
     'yaxis': {'gridcolor': 'rgba(255,255,255,0.1)', 'linecolor': 'rgba(255,255,255,0.1)'},
 }
-
 
 def calculate_metrics(df):
     """Calculate key metrics."""
@@ -112,10 +84,13 @@ def calculate_metrics(df):
         'unique_customers': df['customer_id'].nunique() if 'customer_id' in df.columns else None
     }
 
+@st.cache_data
+def convert_df(df):
+    """Converts the dataframe to CSV format safely without index."""
+    return df.to_csv(index=False).encode('utf-8')
 
 def main():
-    # === SIDEBAR ===
-    create_sidebar()  # <--- Injecting the custom sidebar here
+    create_sidebar()
     
     st.markdown("<h1>📊 Sales Dashboard</h1>", unsafe_allow_html=True)
     st.caption("Real-time overview of your sales performance")
@@ -125,9 +100,48 @@ def main():
         st.stop()
     
     df = st.session_state['data']
-    metrics = calculate_metrics(df)
+
+    # === DATE FILTER ===
+    st.markdown('<div class="date-filter-container">', unsafe_allow_html=True)
+    col_f1, col_f2, col_f3 = st.columns([1, 1, 2])
+    with col_f1:
+        start_date = st.date_input(
+            "📅 From",
+            value=df['order_date'].min().date(),
+            min_value=df['order_date'].min().date(),
+            max_value=df['order_date'].max().date()
+        )
+    with col_f2:
+        end_date = st.date_input(
+            "📅 To",
+            value=df['order_date'].max().date(),
+            min_value=df['order_date'].min().date(),
+            max_value=df['order_date'].max().date()
+        )
+    with col_f3:
+        st.markdown("<br>", unsafe_allow_html=True)
+        if st.button("🔄 Reset to Full Range", use_container_width=False):
+            start_date = df['order_date'].min().date()
+            end_date = df['order_date'].max().date()
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # Apply filter
+    df_filtered = df[
+        (df['order_date'] >= pd.Timestamp(start_date)) &
+        (df['order_date'] <= pd.Timestamp(end_date))
+    ]
+
+    if df_filtered.empty:
+        st.warning("⚠️ No data in this date range. Try a wider range.")
+        st.stop()
+
+    # Show filter info if not full range
+    if start_date != df['order_date'].min().date() or end_date != df['order_date'].max().date():
+        st.info(f"📅 Showing {len(df_filtered):,} transactions from {start_date} to {end_date}")
+
+    # === METRICS ROW (Using df_filtered) ===
+    metrics = calculate_metrics(df_filtered)
     
-    # === METRICS ROW ===
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
@@ -141,16 +155,16 @@ def main():
     
     st.markdown("---")
     
-    # === TABS ===
+    # === TABS (Using df_filtered) ===
     tab1, tab2, tab3 = st.tabs(["📈 Trends", "📅 Time Analysis", "📊 Breakdown"])
     
     with tab1:
         st.markdown("### Revenue Trend")
         
         agg = st.radio("Aggregate by:", ["Daily", "Weekly", "Monthly"], horizontal=True, label_visibility="collapsed")
-        agg_map = {"Daily": "D", "Weekly": "W", "Monthly": "M"}
+        agg_map = {"Daily": "D", "Weekly": "W", "Monthly": "ME"}
         
-        daily = df.groupby('order_date')['total_value'].sum().reset_index()
+        daily = df_filtered.groupby('order_date')['total_value'].sum().reset_index()
         daily = daily.set_index('order_date').resample(agg_map[agg]).sum().reset_index()
         
         fig = go.Figure()
@@ -191,7 +205,7 @@ def main():
         with col1:
             st.markdown("### Revenue by Day of Week")
             
-            df_copy = df.copy()
+            df_copy = df_filtered.copy()
             df_copy['dow'] = df_copy['order_date'].dt.day_name()
             order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
             dow = df_copy.groupby('dow')['total_value'].sum().reindex(order).fillna(0)
@@ -207,7 +221,7 @@ def main():
         with col2:
             st.markdown("### Revenue by Month")
             
-            df_copy = df.copy()
+            df_copy = df_filtered.copy()
             df_copy['month'] = df_copy['order_date'].dt.to_period('M').astype(str)
             monthly = df_copy.groupby('month')['total_value'].sum().reset_index()
             
@@ -222,7 +236,7 @@ def main():
     with tab3:
         st.markdown("### Top 10 Products by Revenue")
         
-        top = df.groupby('product_name')['total_value'].sum().sort_values(ascending=True).tail(10)
+        top = df_filtered.groupby('product_name')['total_value'].sum().sort_values(ascending=True).tail(10)
         
         fig = px.bar(
             x=top.values, y=top.index,
@@ -233,19 +247,36 @@ def main():
         fig.update_layout(**CHART_THEME, height=400, showlegend=False, coloraxis_showscale=False)
         st.plotly_chart(fig, use_container_width=True)
     
-    # === DATA QUALITY ===
+    st.markdown("---")
+    
+    # === DATA QUALITY & EXPORT ROW (Using df_filtered) ===
+    st.markdown("### 📥 Data Management")
+    
     with st.expander("🔍 Data Quality Summary"):
         col1, col2 = st.columns(2)
         
         with col1:
             st.markdown("**Column Info**")
-            info = pd.DataFrame({'Column': df.columns, 'Type': df.dtypes.astype(str), 'Non-Null': df.count().values})
+            info = pd.DataFrame({'Column': df_filtered.columns, 'Type': df_filtered.dtypes.astype(str), 'Non-Null': df_filtered.count().values})
             st.dataframe(info, use_container_width=True, hide_index=True)
         
         with col2:
             st.markdown("**Statistics**")
-            st.dataframe(df.describe().round(2), use_container_width=True)
-
+            st.dataframe(df_filtered.describe().round(2), use_container_width=True)
+            
+    with st.expander("💾 Export Cleaned Dataset"):
+        st.write("Download your formatted, cleaned dataset based on the selected date range.")
+        
+        # Call the cached conversion function using the FILTERED data
+        csv_data = convert_df(df_filtered)
+        
+        st.download_button(
+            label="📥 Download CSV",
+            data=csv_data,
+            file_name="SME_Cleaned_Transactions.csv",
+            mime="text/csv",
+            use_container_width=True
+        )
 
 if __name__ == "__main__":
     main()

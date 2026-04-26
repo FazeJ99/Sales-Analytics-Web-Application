@@ -17,6 +17,44 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# --- LAYOUT & SPACING FIX ---
+st.markdown("""
+    <style>
+    /* 1. SCALING FIX: Force the base font size down so the app fits better on laptops */
+    html, body, [class*="css"] {
+        font-size: 14px !important; 
+    }
+    
+    /* 2. Reduce massive default whitespace at top and sides */
+    .block-container {
+        padding-top: 1.5rem !important;
+        padding-bottom: 1.5rem !important;
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
+        max-width: 98% !important;
+    }
+    
+    /* 3. Compact the file uploader */
+    [data-testid="stFileUploader"] { padding: 1rem !important; }
+    
+    /* 4. Tighten headers */
+    h1 { margin-bottom: 0.5rem !important; padding-bottom: 0 !important; font-size: 2.2rem !important; }
+    p { margin-bottom: 1rem !important; }
+    
+    /* --- AGGRESSIVE SIDEBAR COLLAPSE FIX --- */
+    [data-testid="collapsedControl"],
+    button[title="Collapse sidebar"],
+    button[kind="header"] { 
+        display: none !important; 
+        visibility: hidden !important; 
+        width: 0 !important; 
+        height: 0 !important; 
+        pointer-events: none !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+
 # --- ULTIMATE CSS ---
 st.markdown("""
 <style>
@@ -94,7 +132,6 @@ st.markdown("""
     
     /* ===== MAIN CONTAINER ===== */
     .block-container {
-        padding: 2rem 3rem 4rem 3rem !important;
         max-width: 100% !important;
         position: relative;
         z-index: 1;
@@ -131,7 +168,6 @@ st.markdown("""
     }
     
     h1 {
-        font-size: 2.75rem !important;
         font-weight: 800 !important;
         background: linear-gradient(135deg, #ffffff 0%, #a78bfa 50%, #06b6d4 100%);
         -webkit-background-clip: text;
@@ -285,7 +321,7 @@ st.markdown("""
         backdrop-filter: blur(20px);
         border: 1px solid rgba(255, 255, 255, 0.05);
         border-radius: var(--border-radius);
-        padding: 1.5rem;
+        padding: 1.25rem !important; /* Slightly reduced to fit 4 columns */
         transition: var(--transition-normal);
     }
     
@@ -391,6 +427,9 @@ st.markdown("""
     .delay-3 { animation-delay: 0.3s; opacity: 0; }
     .delay-4 { animation-delay: 0.4s; opacity: 0; }
     .delay-5 { animation-delay: 0.5s; opacity: 0; }
+    .delay-6 { animation-delay: 0.6s; opacity: 0; }
+    .delay-7 { animation-delay: 0.7s; opacity: 0; }
+    .delay-8 { animation-delay: 0.8s; opacity: 0; }
     
     /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
@@ -675,63 +714,96 @@ def show_data_ready_interface():
     <p style="text-align: center; color: var(--text-secondary); margin-bottom: 1.5rem;">Choose a module to dive deeper</p>
     """, unsafe_allow_html=True)
     
-    # Navigation Cards with ACTUAL BUTTONS
-    col1, col2, col3 = st.columns(3)
+    # --- UPDATED NAVIGATION GRID (2 Rows of 4 Cards) ---
+    col1, col2, col3, col4 = st.columns(4)
     
     with col1:
         st.markdown("""
-        <div class="glass-card fade-in-up delay-1" style="text-align: center; padding: 2rem;">
-            <div style="font-size: 2.5rem; margin-bottom: 1rem;">📊</div>
-            <div style="font-size: 1.1rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">Dashboard</div>
-            <div style="font-size: 0.8rem; color: var(--text-secondary);">KPIs, trends & insights</div>
+        <div class="glass-card fade-in-up delay-1" style="text-align: center;">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📊</div>
+            <div style="font-size: 1rem; font-weight: 600; color: white; margin-bottom: 0.25rem;">Dashboard</div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary);">KPIs & trends</div>
         </div>
         """, unsafe_allow_html=True)
         if st.button("Open Dashboard →", key="btn_dash", use_container_width=True):
             st.switch_page("pages/Dashboard.py")
-    
+            
     with col2:
         st.markdown("""
-        <div class="glass-card fade-in-up delay-2" style="text-align: center; padding: 2rem;">
-            <div style="font-size: 2.5rem; margin-bottom: 1rem;">📦</div>
-            <div style="font-size: 1.1rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">Products</div>
-            <div style="font-size: 0.8rem; color: var(--text-secondary);">Performance & rankings</div>
+        <div class="glass-card fade-in-up delay-2" style="text-align: center;">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📦</div>
+            <div style="font-size: 1rem; font-weight: 600; color: white; margin-bottom: 0.25rem;">Products</div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary);">Performance</div>
         </div>
         """, unsafe_allow_html=True)
         if st.button("Open Products →", key="btn_prod", use_container_width=True):
             st.switch_page("pages/Products.py")
-    
+            
     with col3:
         st.markdown("""
-        <div class="glass-card fade-in-up delay-3" style="text-align: center; padding: 2rem;">
-            <div style="font-size: 2.5rem; margin-bottom: 1rem;">🛒</div>
-            <div style="font-size: 1.1rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">Basket Analysis</div>
-            <div style="font-size: 0.8rem; color: var(--text-secondary);">Product associations</div>
+        <div class="glass-card fade-in-up delay-3" style="text-align: center;">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📋</div>
+            <div style="font-size: 1rem; font-weight: 600; color: white; margin-bottom: 0.25rem;">Product Analysis</div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary);">ABC inventory</div>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("Open Analysis →", key="btn_abc", use_container_width=True):
+            st.switch_page("pages/Product_Analysis.py")
+            
+    with col4:
+        st.markdown("""
+        <div class="glass-card fade-in-up delay-4" style="text-align: center;">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">🛒</div>
+            <div style="font-size: 1rem; font-weight: 600; color: white; margin-bottom: 0.25rem;">Basket Analysis</div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary);">Associations</div>
         </div>
         """, unsafe_allow_html=True)
         if st.button("Open Basket →", key="btn_basket", use_container_width=True):
             st.switch_page("pages/Basket_Analysis.py")
-    
+            
     st.markdown("<br>", unsafe_allow_html=True)
     
-    col4, col5 = st.columns(2)
-    
-    with col4:
-        st.markdown("""
-        <div class="glass-card fade-in-up delay-4" style="text-align: center; padding: 2rem;">
-            <div style="font-size: 2.5rem; margin-bottom: 1rem;">🤖</div>
-            <div style="font-size: 1.1rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">AI Forecast</div>
-            <div style="font-size: 0.8rem; color: var(--text-secondary);">ML-powered predictions</div>
-        </div>
-        """, unsafe_allow_html=True)
-        if st.button("Open AI Forecast →", key="btn_ai", use_container_width=True):
-            st.switch_page("pages/AI_Forecasting.py")
+    col5, col6, col7, col8 = st.columns(4)
     
     with col5:
         st.markdown("""
-        <div class="glass-card fade-in-up delay-5" style="text-align: center; padding: 2rem;">
-            <div style="font-size: 2.5rem; margin-bottom: 1rem;">📄</div>
-            <div style="font-size: 1.1rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">Reports</div>
-            <div style="font-size: 0.8rem; color: var(--text-secondary);">Generate PDF reports</div>
+        <div class="glass-card fade-in-up delay-5" style="text-align: center;">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">🤖</div>
+            <div style="font-size: 1rem; font-weight: 600; color: white; margin-bottom: 0.25rem;">AI Forecast</div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary);">Predictions</div>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("Open Forecast →", key="btn_ai", use_container_width=True):
+            st.switch_page("pages/AI_Forecasting.py")
+            
+    with col6:
+        st.markdown("""
+        <div class="glass-card fade-in-up delay-6" style="text-align: center;">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">👥</div>
+            <div style="font-size: 1rem; font-weight: 600; color: white; margin-bottom: 0.25rem;">Segments</div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary);">RFM groups</div>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("Open Segments →", key="btn_rfm", use_container_width=True):
+            st.switch_page("pages/Customer_Segments.py")
+            
+    with col7:
+        st.markdown("""
+        <div class="glass-card fade-in-up delay-7" style="text-align: center;">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">💬</div>
+            <div style="font-size: 1rem; font-weight: 600; color: white; margin-bottom: 0.25rem;">AI Assistant</div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary);">Chat with data</div>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("Open Assistant →", key="btn_chat", use_container_width=True):
+            st.switch_page("pages/AI_Assistant.py")
+            
+    with col8:
+        st.markdown("""
+        <div class="glass-card fade-in-up delay-8" style="text-align: center;">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📄</div>
+            <div style="font-size: 1rem; font-weight: 600; color: white; margin-bottom: 0.25rem;">Reports</div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary);">PDFs</div>
         </div>
         """, unsafe_allow_html=True)
         if st.button("Open Reports →", key="btn_reports", use_container_width=True):
@@ -741,7 +813,6 @@ def show_data_ready_interface():
     
     with st.expander("👀 Data Preview"):
         st.dataframe(df.head(20), use_container_width=True)
-
 
 if __name__ == "__main__":
     main()

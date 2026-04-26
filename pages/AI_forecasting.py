@@ -22,6 +22,13 @@ except ImportError:
 
 st.set_page_config(page_title="AI Forecast", page_icon="🤖", layout="wide")
 
+# --- SIDEBAR COLLAPSE FIX ---
+st.markdown("""
+    <style>
+    [data-testid="collapsedControl"] { display: none !important; }
+    </style>
+""", unsafe_allow_html=True)
+
 # --- CSS ---
 st.markdown("""
 <style>

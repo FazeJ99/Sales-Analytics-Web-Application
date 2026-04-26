@@ -10,6 +10,13 @@ from sidebar import create_sidebar  # <--- Importing your custom sidebar
 
 st.set_page_config(page_title="Products", page_icon="📦", layout="wide")
 
+# --- SIDEBAR COLLAPSE FIX ---
+st.markdown("""
+    <style>
+    [data-testid="collapsedControl"] { display: none !important; }
+    </style>
+""", unsafe_allow_html=True)
+
 # --- CSS ---
 st.markdown("""
 <style>
