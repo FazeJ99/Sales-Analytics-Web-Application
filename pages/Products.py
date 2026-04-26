@@ -66,7 +66,7 @@ def main():
     # === SIDEBAR ===
     create_sidebar()  # <--- Injecting the custom sidebar here
     
-    st.markdown("<h1>📦 Product Analysis</h1>", unsafe_allow_html=True)
+    st.markdown("<h1>📦 Products</h1>", unsafe_allow_html=True)
     st.caption("Deep dive into your product performance")
     
     if st.session_state.get('data') is None:
