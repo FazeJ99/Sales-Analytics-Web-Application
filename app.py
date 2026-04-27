@@ -516,7 +516,7 @@ def process_data(df_raw, mapping):
         df['quantity'] = pd.to_numeric(df['quantity'], errors='coerce')
         df['unit_price'] = pd.to_numeric(df['unit_price'], errors='coerce')
         df['total_value'] = df['quantity'] * df['unit_price']
-        df['order_date'] = pd.to_datetime(df['order_date'], errors='coerce')
+        df['order_date'] = pd.to_datetime(df['order_date'], errors='coerce').dt.tz_localize(None) # Remove timezone for PyArrow compatibility
         df = df[(df['quantity'] > 0) & (df['unit_price'] > 0)].dropna(subset=['order_date'])
         return df
     except Exception as e:
