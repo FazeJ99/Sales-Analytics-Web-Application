@@ -640,7 +640,8 @@ def process_uploaded_file(uploaded_file):
     st.success(f"✅ Loaded **{len(df_raw):,}** rows × **{len(df_raw.columns)}** columns")
     
     with st.expander("👀 Preview"):
-        st.dataframe(df_raw.head(10), use_container_width=True)
+        preview = df_raw.head(10).copy().astype(str)
+        st.dataframe(preview, use_container_width=True)
     
     st.markdown("---")
     
