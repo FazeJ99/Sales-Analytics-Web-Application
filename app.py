@@ -516,7 +516,7 @@ def process_data(df_raw, mapping):
         df['quantity'] = pd.to_numeric(df['quantity'], errors='coerce')
         df['unit_price'] = pd.to_numeric(df['unit_price'], errors='coerce')
         df['total_value'] = df['quantity'] * df['unit_price']
-        df['order_date'] = pd.to_datetime(df['order_date'], errors='coerce').astype('datetime64[s]')  # Force datetime precision for PyArrow
+        df['order_date'] = pd.to_datetime(df['order_date'], errors='coerce')
         df = df[(df['quantity'] > 0) & (df['unit_price'] > 0)].dropna(subset=['order_date'])
         return df
     except Exception as e:
@@ -640,8 +640,7 @@ def process_uploaded_file(uploaded_file):
     st.success(f"✅ Loaded **{len(df_raw):,}** rows × **{len(df_raw.columns)}** columns")
     
     with st.expander("👀 Preview"):
-        preview = df_raw.head(10).copy().astype(str)
-        st.dataframe(preview, use_container_width=True)
+        st.dataframe(df_raw.head(10), use_container_width=True)
     
     st.markdown("---")
     
