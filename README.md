@@ -5,7 +5,7 @@
 ![Pandas](https://img.shields.io/badge/Pandas-Data_Processing-150458.svg)
 ![Scikit-Learn](https://img.shields.io/badge/scikit--learn-Machine_Learning-F7931E.svg)
 
-An enterprise-grade, web-based analytics platform designed to help small-to-medium e-commerce enterprises transform raw transactional data into actionable business intelligence. 
+A web-based analytics platform designed to help small-to-medium e-commerce enterprises transform raw transactional data into actionable business intelligence. 
 
 Built with a focus on privacy-by-design and intuitive UX, this platform requires zero coding knowledge from the end-user. Simply upload a sales CSV, and the system automatically cleans, maps, and models the data.
 
@@ -32,7 +32,7 @@ Built with a focus on privacy-by-design and intuitive UX, this platform requires
 
 **1. Clone the repository**
 ```bash
-'git clone https://github.com/abdulmale3k/Integrated-_Sales_Analytics_Platform.git'
+git clone https://github.com/abdulmale3k/Integrated-_Sales_Analytics_Platform.git
 cd Integrated-_Sales_Analytics_Platform
 ```
 
@@ -48,11 +48,12 @@ pip install -r requirements.txt
 ```
 
 **4. Configure API Keys**
-To use the AI Assistant and advanced forecasting features, you must provide a Gemini API key. 
-Create a `.streamlit/secrets.toml` file in the root directory and add your key:
+To use the AI Assistant and advanced forecasting features, you must provide a Gemini API key.
+Create a folder called `.streamlit` in the root directory, then create `secrets.toml` inside it:
 ```toml
 GEMINI_API_KEY = "your_api_key_here"
 ```
+If deploying on Streamlit Community Cloud, add your key in App Settings, Secrets instead.
 
 **5. Launch the Application**
 ```bash
