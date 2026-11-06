@@ -774,7 +774,7 @@ def show_data_ready_interface():
         </div>
         """, unsafe_allow_html=True)
         if st.button("Open Forecast →", key="btn_ai", use_container_width=True):
-            st.switch_page("pages/AI_Forecasting.py")
+            st.switch_page("pages/AI_forecasting.py")
             
     with col6:
         st.markdown("""
