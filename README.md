@@ -5,7 +5,7 @@
 ![Pandas](https://img.shields.io/badge/Pandas-Data_Processing-150458.svg)
 ![Scikit-Learn](https://img.shields.io/badge/scikit--learn-Machine_Learning-F7931E.svg)
 
-![Sales Analytics Dashboard Demo](https://github.com/FazeJ99/Sales-Analytics-Web-Application/blob/main/assets/SME%20Analytics%20platform.gif)
+![Sales Analytics Dashboard Demo](https://github.com/FazeJ99/Sales-Analytics-Web-Application/blob/main/assets/SMEAnalyticsplatform.gif)
 
 A web-based analytics platform designed to help small-to-medium e-commerce enterprises transform raw transactional data into actionable business intelligence. 
 
