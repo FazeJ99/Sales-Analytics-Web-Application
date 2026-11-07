@@ -5,6 +5,8 @@
 ![Pandas](https://img.shields.io/badge/Pandas-Data_Processing-150458.svg)
 ![Scikit-Learn](https://img.shields.io/badge/scikit--learn-Machine_Learning-F7931E.svg)
 
+![Sales Analytics Dashboard Demo](assets/demo.gif)
+
 A web-based analytics platform designed to help small-to-medium e-commerce enterprises transform raw transactional data into actionable business intelligence. 
 
 Built with a focus on privacy-by-design and intuitive UX, this platform requires zero coding knowledge from the end-user. Simply upload a sales CSV, and the system automatically cleans, maps, and models the data.
